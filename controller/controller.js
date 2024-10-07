@@ -38,42 +38,63 @@ exports.postCode = (req, res)=>{
 
         fs.writeFileSync(initFinalname, receivedCode);
 
+        let err = [];
+
         exec(`javac ${initFinalname} && java ${filename}`, (error, stdout, stderr) => {
+
             if (error) {
-                console.log(stderr);
-                return;
+                console.log(error)
+                err.push(error);
+                res.status(200).json({
+                    message: stderr
+                });
             }
-            console.log(stdout);
+            else{
+                console.log(stdout);
+                res.status(200).json({
+                    message: stdout
+                });
 
-            res.status(200).json({
-                message: 'Code Recieved Successfully'
-            });
-
+            }
+            
             fs.unlink(initFinalname, (err) => {
                 if (err) {
                     console.log('Error deleting file', err);
                 }
             });
 
-            fs.unlink((filename + '.class'), (err) => {
-                if (err) {
-                    console.log('Error deleting file', err);
-                }
-            });
+            if(err.length == 0){
+                fs.unlink((filename + '.class'), (err) => {
+                    if (err) {
+                        console.log('Error deleting file', err);
+                    }
+                });
+            }
         });
     }
     else if (language === 'JavaScript') {
 
         const sandbox = {
-            console: console
+            console: {
+                log: (message)=>{
+                    output.push(message);
+                }
+                // error: (message) => {
+                //     output.push(`ERROR: ${message}`);
+                // }
+            }
         };
+
+        let output = [];
 
         try {
             vm.createContext(sandbox);
 
             const script = new vm.Script(receivedCode);
 
-            const output = script.runInContext(sandbox);
+            script.runInContext(sandbox);
+
+            console.log(output);
 
             res.status(200).json({
                 message: 'Code executed succesfully',
@@ -81,7 +102,11 @@ exports.postCode = (req, res)=>{
             });
         }
         catch (err) {
-            next(new Error(err));
+            // next(new Error(err));
+            res.status(200).json({
+                message: 'Code executed succesfully',
+                result: err.message
+            });
         }
     }
 };
