@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Management</title>
+    <link rel="stylesheet" href="collabFiels.css">
+</head>
+<body>
+
+    <h1>Join or Create a Room</h1>
+    <form>
+    <input type="text" id="roomName" name="roomId" placeholder="Enter room id" />
+    <div>
+        <button type="submit" id="joinRoom" formaction="/joinRoom" formmethod="post">Join Room</button>
+    </div>
+    </form>
+    <form>
+    <div>
+        <button type="submit" id="createRoom" formaction="/createRoom" formmethod="post">Create Room</button>
+    </div>
+</form>
+</body>
+</html>

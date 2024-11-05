@@ -6,4 +6,10 @@ router.get('/', controller.getHome);
 
 router.post('/submitCode', controller.postCode);
 
+router.post('/getCollab', controller.getCollabFields);
+
+router.post('/createRoom', controller.createRoom);
+
+router.post('/joinRoom', controller.joinRoom);
+
 module.exports = router;

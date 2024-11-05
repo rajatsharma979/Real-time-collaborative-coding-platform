@@ -3,18 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="editor.css">
     <title>Document</title>
 </head>
 <body>
 
-    <select id="lang">
-        <option value="Java">Java</option>
-        <option value="JavaScript">JavaScript</option>
+    <select id="lang" >
+        <option value="Java" class="dropdown" selected>Java</option>
+        <!-- <option value="JavaScript">JavaScript</option> -->
     </select>
-    <div id="code" name="code" style="width: 100rem; height: 35rem; background-color: black;"></div>
-    <button type="button" id="btn">Submit</button>
+    <input type="submit" id="btn" class="runButton" value="Run">
+    <form method="post" action="/getCollab">
+        <button type="submit">Collab</button>
+    </form>
+
+    <div class="maindiv" style="display: flex;">
     
-    <script src="editorBundle.js"></script>
+    <div id="code" name="code" style="width: 62rem; height: 92vh; background-color: black;"></div>
+    <div id="outputConsole" style="width: 33rem; height: 92vh; background-color: white; border: 1px solid black;">
+        <h1 style="margin-left: 0.75rem;">Output</h1>
+        <div class="showingOutput" style="margin-left: 0.75rem;"></div>
+    </div>
+
+    </div>
+    <script src="initialEditorBundle.js"></script>
 </body>
 
 </html>

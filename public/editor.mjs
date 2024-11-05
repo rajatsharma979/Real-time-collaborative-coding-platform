@@ -2,46 +2,168 @@ import { EditorView, basicSetup } from "codemirror";
 import { EditorState } from "@codemirror/state";
 import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
-import {java} from "@codemirror/lang-java";
-// import {cpp} from "@codemirror/lang-cpp";
-// import {python} from "@codemirror/lang-python";
-// import { EditorState } from "@codemirror/state";
+import { java } from "@codemirror/lang-java";
 
 
-let editor = new EditorView({
+const ws = new WebSocket('ws://localhost:3000');
+let messageQueue = []; // Queue to hold messages until the connection is open
 
-        state: EditorState.create({
-        doc: 'Write your code hear',
-        extensions: [basicSetup, java(), javascript(), oneDark]
-    }),
+const showingOutput = document.querySelector('.showingOutput');
+const roomId = document.querySelector('.roomId').textContent;
+
+let isLocalChange = true;
+let editor;
+let debounceTimeout;
+
+const state = EditorState.create({
+    doc: 'Write code...',
+    extensions: [
+        basicSetup,
+        javascript(),
+        java(),
+        oneDark,
+        EditorView.updateListener.of((update) => {
+            if (update.docChanged && isLocalChange) {
+                clearTimeout(debounceTimeout);   //It cancels previous timeouts. When the user is typing quickly, multiple updates can be triggered in rapid succession. Without clearTimeout, each keystroke would set a new timeout. This means that if the user types quickly, multiple timeouts could stack up, leading to the function being called multiple times after the delay, which is not the desired behavior. 
+
+
+                // const changedCode = update.state.doc.toString();
+                //     console.log(changedCode);
+
+                //     if (ws.readyState === WebSocket.OPEN) {
+                //         ws.send(JSON.stringify({ type: 'edit', changedCode: changedCode }));
+                //     }
+
+                debounceTimeout = setTimeout(() => {
+                    const changedCode = update.state.doc.toString();
+                    console.log(changedCode);
+
+                    if (ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ type: 'edit', roomId: roomId, changedCode: changedCode }));
+                    }
+                }, 75); // Adjust as needed
+            }
+        })
+    ]
+});
+
+editor = new EditorView({
+    state,
     parent: document.querySelector('#code')
 });
 
-const submitCode = ()=> {
+// Resize function to handle window resizing
+function resizeEditor() {
+    const parent = document.getElementById('parent');
+    const width = parent.clientWidth;
+    const height = parent.clientHeight;
+    editor.dom.style.width = `${width}px`;
+    editor.dom.style.height = `${height}px`;
+}
 
-    const code = editor.state.doc.toString();
-    const lang = document.querySelector('#lang').value;
+// Call resize on window resize
+window.addEventListener('resize', resizeEditor);
+resizeEditor(); // Initial size set
 
-    fetch('http://localhost:3000/submitCode', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            lang: lang,
-            code: code
-        })
-    })
-        .then(res=>{
-            return res.json();
-        })
-        .then(resData => {
-            console.log('In fetch url', resData);
-        })
-        .catch(err => {
-            console.log(err);
-        })
+// Function to send messages
+// function sendMessage(data) {
+//     const message = JSON.stringify(data);
+//     if (ws.readyState === WebSocket.OPEN) {
+//         ws.send(message);
+//     } else {
+//         messageQueue.push(message); // Queue the message if not open
+//     }
+// }
+
+// WebSocket Event Handlers
+ws.onopen = () => {
+
+    ws.send(JSON.stringify({type: 'registration', roomId: roomId}));
+    console.log('Client connected');
+    // messageQueue.forEach(message => ws.send(message)); // Send any queued messages
+    // messageQueue = []; // Clear the queue
 };
 
-document.querySelector('#btn').addEventListener('click', submitCode);
+ws.onmessage = (event) => {
 
+    const data = JSON.parse(event.data);
+
+    if (data.type === 'output') {
+
+        showingOutput.innerHTML = '';
+
+        data.result.forEach(element => {
+            showingOutput.insertAdjacentHTML('beforeend', `<div>${element}</div>`);
+        });
+
+    }
+    else if(data.type === 'edit'){
+
+        const receivedCode = data.code;
+
+        console.log(receivedCode);
+
+        if (editor.state.doc.toString() !== receivedCode) {
+
+            isLocalChange = false; // Prevent local updates
+
+            editor.dispatch({
+                changes: { from: 0, to: editor.state.doc.length, insert: receivedCode }
+            });
+
+            isLocalChange = true; // Allow local updates again
+        }
+    }
+
+};
+
+ws.onerror = (error) => {
+    console.error('WebSocket error observed:', error);
+};
+
+ws.onclose = () => {
+    console.log('client disconnected client side');
+};
+
+const submitCode = ()=>{
+
+    const lang = document.querySelector('#lang').value;
+    const code = editor.state.doc.toString();
+
+    showingOutput.innerHTML = '';
+    showingOutput.insertAdjacentHTML('beforeend', `<div>Your code is being executed...</div>`);
+
+    console.log('submit clicked');
+    ws.send(JSON.stringify({type: 'submitCode', lang: lang, code: code, roomId: roomId}));
+}
+
+document.querySelector('#btn').addEventListener('click', submitCode);
+// const submitCode = () => {
+//     const lang = document.querySelector('#lang').value; // Ensure this is defined in your HTML
+//     const code = editor.state.doc.toString();
+
+//     fetch('http://localhost:3000/submitCode', {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({
+//             lang: lang,
+//             code: code
+//         })
+//     })
+//         .then(res => res.json())
+//         .then(resData => {
+
+//             console.log('In fetch url', resData.message);
+
+//             showingOutput.innerHTML = '';
+
+//             resData.message.forEach(element => {
+//                 showingOutput.insertAdjacentHTML('beforeend', `<div>${element}</div>`);
+//             });
+//         })
+//         .catch(err => {
+//             console.log(err);
+//         });
+// };
