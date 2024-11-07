@@ -5,9 +5,37 @@
     border-radius: 5px;
     width: 100px;
 }
-
-.runButton {
+.heading{
+    text-align: center;
+    padding: 10px;
+    margin: 0;
+    background: linear-gradient(#65afff, white);
+    color: #0056b3;
+    box-shadow: 2px 2px black;
+}
+.btn {
+    margin-top: 5px;
     padding: 7px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.container {
+    background-color: white;
+    padding: 6px;
+    display: flex;
+    justify-content:space-around;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.btn:hover {
+    background-color: #0056b3;
+}
+.runButton {
+    padding: 7px 17px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -18,30 +46,4 @@
 
 .runButton:hover {
     background-color: #0056b3;
-}
-
-.runButton {
-    position: relative;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-.spinner {
-    position: absolute;
-    border: 3px solid #f3f3f3; /* Light grey */
-    border-top: 3px solid #3498db; /* Blue */
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    animation: spin 1s linear infinite;
-    display: none; /* Initially hidden */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }

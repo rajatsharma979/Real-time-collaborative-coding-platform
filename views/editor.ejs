@@ -1,29 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="editor.css">
     <title>Document</title>
 </head>
+
 <body>
 
-    <select id="lang" >
-        <option value="Java" class="dropdown" selected>Java</option>
-        <!-- <option value="JavaScript">JavaScript</option> -->
-    </select>
-    <input type="submit" id="btn" class="runButton" value="Run">
-    <form method="post" action="/getCollab">
-        <button type="submit">Collab</button>
-    </form>
+    <h1 class="heading">Collab Code</h1>
+    <div class="container">
+        <div>
+            <label for="options">Select an option:</label>
+            <select id="lang" class="dropdown">
+                <option value="Java" selected>Java</option>
+            </select>
+            <input type="submit" id="btn" class="runButton" value="Run">
+        </div>
+        <div>
+            <form method="post" action="/getCollab">
+                <button type="submit" id="btn" class="btn">Collab</button>
+            </form>
+        </div>
+    </div>
 
     <div class="maindiv" style="display: flex;">
-    
-    <div id="code" name="code" style="width: 62rem; height: 92vh; background-color: black;"></div>
-    <div id="outputConsole" style="width: 33rem; height: 92vh; background-color: white; border: 1px solid black;">
-        <h1 style="margin-left: 0.75rem;">Output</h1>
-        <div class="showingOutput" style="margin-left: 0.75rem;"></div>
-    </div>
+
+        <div id="code" name="code" style="width: 62rem; height: 92vh; background-color: black;"></div>
+        <div id="outputConsole"
+            style="width: 33rem; height: 92vh; background-color: white; border: 1px solid black;overflow: auto;">
+            <h1 style="margin-left: 0.75rem;text-align: center;">Output</h1>
+            <div class="showingOutput" style="margin-left: 0.75rem;"></div>
+        </div>
 
     </div>
     <script src="initialEditorBundle.js"></script>
