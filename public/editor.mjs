@@ -6,7 +6,6 @@ import { java } from "@codemirror/lang-java";
 
 
 const ws = new WebSocket('ws://localhost:3000');
-let messageQueue = []; // Queue to hold messages until the connection is open
 
 const showingOutput = document.querySelector('.showingOutput');
 const roomId = document.querySelector('.roomId').textContent;
@@ -25,14 +24,6 @@ const state = EditorState.create({
         EditorView.updateListener.of((update) => {
             if (update.docChanged && isLocalChange) {
                 clearTimeout(debounceTimeout);   //It cancels previous timeouts. When the user is typing quickly, multiple updates can be triggered in rapid succession. Without clearTimeout, each keystroke would set a new timeout. This means that if the user types quickly, multiple timeouts could stack up, leading to the function being called multiple times after the delay, which is not the desired behavior. 
-
-
-                // const changedCode = update.state.doc.toString();
-                //     console.log(changedCode);
-
-                //     if (ws.readyState === WebSocket.OPEN) {
-                //         ws.send(JSON.stringify({ type: 'edit', changedCode: changedCode }));
-                //     }
 
                 debounceTimeout = setTimeout(() => {
                     const changedCode = update.state.doc.toString();
@@ -80,8 +71,7 @@ ws.onopen = () => {
 
     ws.send(JSON.stringify({type: 'registration', roomId: roomId}));
     console.log('Client connected');
-    // messageQueue.forEach(message => ws.send(message)); // Send any queued messages
-    // messageQueue = []; // Clear the queue
+    
 };
 
 ws.onmessage = (event) => {
@@ -138,32 +128,3 @@ const submitCode = ()=>{
 }
 
 document.querySelector('#btn').addEventListener('click', submitCode);
-// const submitCode = () => {
-//     const lang = document.querySelector('#lang').value; // Ensure this is defined in your HTML
-//     const code = editor.state.doc.toString();
-
-//     fetch('http://localhost:3000/submitCode', {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//             lang: lang,
-//             code: code
-//         })
-//     })
-//         .then(res => res.json())
-//         .then(resData => {
-
-//             console.log('In fetch url', resData.message);
-
-//             showingOutput.innerHTML = '';
-
-//             resData.message.forEach(element => {
-//                 showingOutput.insertAdjacentHTML('beforeend', `<div>${element}</div>`);
-//             });
-//         })
-//         .catch(err => {
-//             console.log(err);
-//         });
-// };

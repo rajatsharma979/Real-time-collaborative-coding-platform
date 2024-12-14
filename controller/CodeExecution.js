@@ -124,60 +124,60 @@ async function executeJavaCode(receivedCode) {
 //     });
 // };
 
-function cleanJSFiles(jsFile) {
-    fs.unlink(jsFile, (err) => {
-        if (err) {
-            console.log('Error in deleting JsCode file', err);
-        }
-    });
-}
+// function cleanJSFiles(jsFile) {
+//     fs.unlink(jsFile, (err) => {
+//         if (err) {
+//             console.log('Error in deleting JsCode file', err);
+//         }
+//     });
+// }
 
-function executeJSCode(receivedCode) {
+// function executeJSCode(receivedCode) {
 
-    return new Promise((resolve, reject) => {
+//     return new Promise((resolve, reject) => {
 
-        const jsFile = 'javaScriptCodeFile.js';
-        fs.writeFileSync(jsFile, receivedCode);
+//         const jsFile = 'javaScriptCodeFile.js';
+//         fs.writeFileSync(jsFile, receivedCode);
 
-        let output = [];
+//         let output = [];
 
-        exec(`node ${jsFile}`, { timeout: 5000 }, (error, stdout, stderr) => {
+//         exec(`node ${jsFile}`, { timeout: 5000 }, (error, stdout, stderr) => {
 
-            if (error) {
+//             if (error) {
 
-                if (error.killed) {
+//                 if (error.killed) {
 
-                    console.log(error);
-                    output.push('Execution timed out. Code took too long to execute. There might be infinite loop or stackoverflow.');
+//                     console.log(error);
+//                     output.push('Execution timed out. Code took too long to execute. There might be infinite loop or stackoverflow.');
 
-                    cleanJSFiles(jsFile);
+//                     cleanJSFiles(jsFile);
 
-                    return reject(output);
-                }
+//                     return reject(output);
+//                 }
 
-                let res = `<pre>${stderr}</pre>`;
+//                 let res = `<pre>${stderr}</pre>`;
 
-                console.log('Error in std', error.message);
+//                 console.log('Error in std', error.message);
 
-                output.push(res);
+//                 output.push(res);
 
-                cleanJSFiles(jsFile);
+//                 cleanJSFiles(jsFile);
 
-                return reject(output);
-            }
-            else {
+//                 return reject(output);
+//             }
+//             else {
 
-                let res = `<pre>${stdout}</pre>`;
+//                 let res = `<pre>${stdout}</pre>`;
 
-                output.push(res);
+//                 output.push(res);
 
-                cleanJSFiles(jsFile);
+//                 cleanJSFiles(jsFile);
 
-                return resolve(output);
-            }
-        });
-    });
-};
+//                 return resolve(output);
+//             }
+//         });
+//     });
+// };
 
 function executeCode(receivedcode, lang) {
 
@@ -185,10 +185,10 @@ function executeCode(receivedcode, lang) {
 
         return executeJavaCode(receivedcode);
     }
-    else if (lang === 'JavaScript') {
+    // else if (lang === 'JavaScript') {
 
-        return executeJSCode(receivedcode);
-    }
+    //     return executeJSCode(receivedcode);
+    // }
 };
 
 module.exports = executeCode;
